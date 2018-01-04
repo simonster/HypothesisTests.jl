@@ -29,6 +29,7 @@ module HypothesisTests
 using Distributions, Roots, StatsBase, Compat
 using Combinatorics: combinations, permutations
 using Rmath: pwilcox, psignrank
+using StatsFuns: norminvcdf, normccdf
 
 import StatsBase.confint
 
