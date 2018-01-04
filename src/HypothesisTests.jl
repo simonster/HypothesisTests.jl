@@ -178,4 +178,5 @@ include("augmented_dickey_fuller.jl")
 include("jarque_bera.jl")
 include("durbin_watson.jl")
 include("permutation.jl")
+include("shapirowilk.jl")
 end
