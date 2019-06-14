@@ -1,12 +1,14 @@
+using Test, Random, Statistics
+
 # Confidence intervals should be tested component-wise against
 # expected results; splatting them into arrays and checking for
 # approximate array equality is incorrect when either limit is
 # infinite.
 macro test_ci_approx(x::Expr, y::Expr)
     return quote
-        Base.Test.@test typeof($(esc(x))) <: Tuple{Real,Real}
-        Base.Test.@test typeof($(esc(x))) == typeof($(esc(y)))
-        Base.Test.@test all(map(isapprox, $(esc(x)), $(esc(y))))
+        Test.@test typeof($(esc(x))) <: Tuple{Real,Real}
+        Test.@test typeof($(esc(x))) == typeof($(esc(y)))
+        Test.@test all(map(isapprox, $(esc(x)), $(esc(y))))
     end
 end
 
@@ -30,3 +32,5 @@ include("show.jl")
 include("t.jl")
 include("wilcoxon.jl")
 include("z.jl")
+include("hotelling.jl")
+include("bartlett.jl")

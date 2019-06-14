@@ -22,11 +22,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-__precompile__()
-
 module HypothesisTests
 
-using Distributions, Roots, StatsBase, Compat
+using Statistics, Random, LinearAlgebra
+using Distributions, Roots, StatsBase
 using Combinatorics: combinations, permutations
 using Rmath: pwilcox, psignrank
 using StatsFuns: norminvcdf, normccdf
@@ -112,7 +111,7 @@ function Base.show(io::IO, test::T) where T<:HypothesisTest
     println(io, "    value under h_0:         $param_under_h0")
     println(io, "    point estimate:          $param_estimate")
     if has_ci
-        ci = map(x -> round.(x, 4), StatsBase.confint(test))
+        ci = map(x -> round.(x, digits=4, base=10), StatsBase.confint(test))
         println(io, "    95% confidence interval: $ci")
     end
     println(io)
@@ -145,7 +144,7 @@ population_param_of_interest(test::T) where {T<:HypothesisTest} = ("not implemen
 default_tail(test::HypothesisTest) = :undefined
 
 function show_params(io::IO, test::T, ident="") where T<:HypothesisTest
-    fieldidx = find(Bool[t<:Number for t in T.types])
+    fieldidx = findall(Bool[t<:Number for t in T.types])
     if !isempty(fieldidx)
         lengths = [length(string(T.names[i])) for i in fieldidx]
         maxlen = maximum(lengths)
@@ -179,5 +178,7 @@ include("augmented_dickey_fuller.jl")
 include("jarque_bera.jl")
 include("durbin_watson.jl")
 include("permutation.jl")
+include("hotelling.jl")
+include("bartlett.jl")
 include("shapirowilk.jl")
 end

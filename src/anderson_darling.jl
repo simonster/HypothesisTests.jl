@@ -38,19 +38,6 @@ function OneSampleADTest(x::AbstractVector{T}, d::UnivariateDistribution) where 
     n = length(x)
     μ, σ = mean_and_std(x)
     y = sort(x)
-    if isa(d, Uniform)
-        m = y[1]
-        r = y[end]-m
-        broadcast!(x->(x-m)/r, y, y)
-        # to avoid -Inf when calculated logccdf(d, 1.0) or logcdf(d, 0.0) in the test.
-        y[1] += eps()
-        y[end] -= eps()
-    elseif isa(d, Exponential)
-        broadcast!(x->x/μ, y, y)
-    else
-        zscore!(y, μ, σ)
-    end
-
     OneSampleADTest(n, μ, σ, adstats(y, d))
 end
 
@@ -205,7 +192,8 @@ function pvalueasym(x::KSampleADTest)
     #
     # Next, the quadratic polynomial is used to fit the log((1-p)/p) to above
     # interpolated quantiles and the value fitted to the estimated standardized
-    # AD statistics Tₘ.
+    # AD statistics Tₘ. If p-value outside of [.00001, .99999] range then
+    # linear extrapolation is used.
     #
     # The p-values from Table 1 of the original paper were reproduced with
     # relative error bounded bounded by 1% in 85% of cases (see the relative
@@ -239,11 +227,14 @@ function pvalueasym(x::KSampleADTest)
     end
     logP =  log.((1 .- PV) ./ PV )
 
+    # perform linear extrapolation with p-value outside of [.00001, .99999]
+    fitlin = (Tk < Tm[1] || Tk > Tm[end])
+
     # locate curve area for extrapolation
-    _, j = findmin(abs(tm - Tk) for tm in Tm)
-    A = [ Tm[i]^p for i = j-1:j+1, p = 0:2 ] # fit in quadratic
-    C = A \ logP[j-1:j+1]
-    lp0 = C[1] + C[2]*Tk + C[3]*Tk^2
+    _, j = findmin([abs(tm - Tk) for tm in Tm[2:end-1]])
+    A = [ Tm[i]^p for i = j:j+2, p = 0:(fitlin ? 1 : 2) ] # fit p-values
+    C = A \ logP[j:j+2]
+    lp0 = C[1] + C[2]*Tk + (fitlin ? 0.0 : C[3]*Tk^2)
     return exp(lp0)/(1 + exp(lp0))
 end
 
@@ -260,7 +251,7 @@ function adkvals(Z⁺, N, samples)
             fij[i, searchsortedfirst(Z⁺, s)] += 1
         end
     end
-    ljs = sum(fij, 1)
+    ljs = sum(fij, dims=1)
 
     A²k = A²km = 0.
     for i in 1:k
@@ -301,8 +292,8 @@ function a2_ksample(samples, modified, method)
 
     A²k, A²km = adkvals(Z⁺, N, samples)
 
-    H = sum(map(i->1./i, n))
-    h = sum(1./(1:N-1))
+    H = sum(map(i->1 ./ i, n))
+    h = sum(1 ./ (1:N-1))
     g = 0.
     for i in 1:N-2
         for j in i+1:N-1

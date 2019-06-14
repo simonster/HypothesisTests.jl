@@ -152,9 +152,9 @@ function pvalue(x::ExactSignedRankTest; tail=:both)
         if tail == :both
             min(1, 2 * minimum(signedrankenumerate(x)))
         elseif tail == :left
-            singedrankenumerate(x.W, x.ranks)[1]
+            first(signedrankenumerate(x))
         elseif tail == :right
-            signedrankenumerate(x.W, x.ranks)[2]
+            last(signedrankenumerate(x))
         end
     end
 end
@@ -247,7 +247,7 @@ function calculate_ci(x::AbstractVector, alpha::Real=0.05; tail=:both)
     m = div(n * (n + 1), 2)
     k_range = 1:div(m, 2)
     l = [1 - 2 * psignrank(i, n, true) for i in k_range]
-    k = indmin(abs.(l-c))
+    k = argmin(abs.(l .- c))
     vals = Float64[]
     enumerated = enumerate(x)
     for (outer_index, outer_value) in enumerated

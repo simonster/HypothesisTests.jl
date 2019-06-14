@@ -1,7 +1,8 @@
-using HypothesisTests, Base.Test
+using HypothesisTests, Test
 using StatsBase
 using HypothesisTests: default_tail
 
+@testset "Power Divergence" begin
 #Example 1 in R
 #Agresti (2007) p. 39
 
@@ -59,7 +60,7 @@ pvalue(m)
 show(IOBuffer(), m)
 
 m = ChisqTest(d)
-m = MultinomialLRT(d)
+m = MultinomialLRTest(d)
 
 confint(m, method = :bootstrap)
 confint(m, method = :bootstrap, tail=:left)
@@ -135,7 +136,7 @@ pvalue(m)
 show(IOBuffer(), m)
 
 m = ChisqTest(d)
-m = MultinomialLRT(d)
+m = MultinomialLRTest(d)
 
 confint(m, method = :bootstrap)
 confint(m, method = :bootstrap, tail=:left)
@@ -164,7 +165,7 @@ y=[1,1,1,2,2,3]
 d = counts(x,y,3)
 
 ChisqTest(d)
-MultinomialLRT(d)
+MultinomialLRTest(d)
 
 PowerDivergenceTest(x,y,3)
 PowerDivergenceTest(x,y,(1:3,1:3))
@@ -172,10 +173,11 @@ PowerDivergenceTest(x,y,(1:3,1:3))
 ChisqTest(x,y,3)
 ChisqTest(x,y,(1:3,1:3))
 
-MultinomialLRT(x,y,3)
-MultinomialLRT(x,y,(1:3,1:3))
+MultinomialLRTest(x,y,3)
+MultinomialLRTest(x,y,(1:3,1:3))
 
 # Test that large counts don't cause overflow (issue #43)
 d = [113997 1031298
      334453 37471]
 PowerDivergenceTest(d)
+end
