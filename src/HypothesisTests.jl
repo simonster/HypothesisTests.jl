@@ -28,6 +28,7 @@ using Statistics, Random, LinearAlgebra
 using Distributions, Roots, StatsBase
 using Combinatorics: combinations, permutations
 using Rmath: pwilcox, psignrank
+using StatsFuns: norminvcdf, normccdf
 
 import StatsBase.confint
 
@@ -187,4 +188,5 @@ include("durbin_watson.jl")
 include("permutation.jl")
 include("hotelling.jl")
 include("bartlett.jl")
+include("shapirowilk.jl")
 end
