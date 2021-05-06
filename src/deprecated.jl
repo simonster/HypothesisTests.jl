@@ -10,3 +10,9 @@ using Base: @deprecate
 @deprecate BartlettsTest BartlettTest
 
 @deprecate confint(x::HypothesisTest, alpha::Real; kwargs...) confint(x; level=1-alpha, kwargs...)
+
+@deprecate ExactPermutationTest(x::AbstractVector{<:Real}, y::AbstractVector{<:Real},
+    f::Function) PermutationTest(f, x, y)
+
+@deprecate ApproximatePermutationTest(x::AbstractVector{<:Real}, y::AbstractVector{<:Real},
+    f::Function, n::Integer) PermutationTest(f, x, y, n)
