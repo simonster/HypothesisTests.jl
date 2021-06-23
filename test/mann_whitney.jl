@@ -53,4 +53,8 @@ end
 @testset "Issue #39" begin
 	@test abs(pvalue(ExactMannWhitneyUTest(Float32[1:10;], Float32[2:11;])) - 0.5096) <= 1e-4
 end
+
+@testset "Issue #113" begin
+  @test abs(pvalue(ApproximateMannWhitneyUTest(Float32[1:10;], Float32[2:11;])) - 0.4948) <= 1e-4
+end
 end
